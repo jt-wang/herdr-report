@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "herdr-report/sessions-v1",
+  "title": "GET /v1/sessions",
+  "description": "Every agent session Herdr knows about on one machine. status, last_message and tail are always there; summary is null while summaries are off, unless the agent wrote its own report. The same data is streamed on /v1/events and kept in sessions.json.",
+  "type": "object",
+  "required": ["version", "host", "generated_at", "workspaces", "sessions"],
+  "properties": {
+    "version": { "const": 1 },
+    "host": { "type": "string", "description": "The machine's name, so a client reading several machines can tell them apart." },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "workspaces": {
+      "type": "array",
+      "description": "Herdr workspaces that hold at least one agent, in Herdr's order.",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "session_ids"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string" },
+          "session_ids": { "type": "array", "items": { "type": "string" }, "description": "Session ids, in Herdr's pane order." }
+        }
+      }
+    },
+    "sessions": { "type": "array", "items": { "$ref": "#/$defs/session" } }
+  },
+  "$defs": {
+    "session": {
+      "type": "object",
+      "required": ["id", "pane_id", "workspace_id", "workspace_label", "label", "title", "agent", "status", "cwd", "tail", "last_message", "summary", "summarizing"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z]+:[A-Za-z0-9_-]+(@[A-Za-z0-9_-]+)?$", "description": "Stable while the session lives, even when its pane moves: <agent>:<the agent's session id>, or terminal:<terminal id> when Herdr reports no agent session." },
+        "pane_id": { "type": "string", "description": "Where the session is now, e.g. w1:p2. Changes when the pane moves to another workspace. Use it to open the pane in another app." },
+        "workspace_id": { "type": "string" },
+        "workspace_label": { "type": "string" },
+        "label": { "type": "string", "description": "The name the user gave the pane, if any." },
+        "title": { "type": "string", "description": "The terminal title." },
+        "agent": { "type": "string", "description": "Herdr's agent kind: claude, codex, opencode, kimi, cursor, …" },
+        "status": { "enum": ["working", "blocked", "done", "idle", "unknown"], "description": "Herdr's live state for the agent. blocked: stopped at an approval or question." },
+        "cwd": { "type": "string" },
+        "tail": { "type": "string", "description": "The last lines of the pane's screen." },
+        "last_message": { "type": ["string", "null"], "description": "The agent's last words, read from its own record; null when there is none we can read." },
+        "summary": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/summary" }] },
+        "summarizing": { "type": "boolean", "description": "A new summary is being made right now." }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["goal", "now", "needs_you", "blocked", "doing", "todo", "done", "source", "summarized_by", "updated_at", "self_report_at"],
+      "properties": {
+        "goal": { "type": "string", "description": "What the whole session is trying to get done." },
+        "now": { "type": "string", "description": "What it is doing or waiting for right now." },
+        "needs_you": { "type": "array", "items": { "$ref": "#/$defs/item" }, "description": "Open decisions, approvals or actions for the user." },
+        "blocked": { "type": "array", "items": { "$ref": "#/$defs/item" } },
+        "doing": { "type": "array", "items": { "$ref": "#/$defs/item" } },
+        "todo": { "type": "array", "items": { "$ref": "#/$defs/item" } },
+        "done": { "type": "array", "items": { "$ref": "#/$defs/item" }, "description": "Most recent first." },
+        "source": { "enum": ["self-report", "transcript", "screen"], "description": "Where goal, done and todo come from. transcript: the session's own record; screen: the last screens of the pane; self-report: there is no summary yet, only the agent's own report." },
+        "summarized_by": { "type": "string", "description": "Who wrote it: the agent kind for a self-report, else the summarizer and model, e.g. claude-code:haiku, opencode:opencode/claude-haiku-5-5, openai-compatible:<model>, command." },
+        "updated_at": { "type": "string", "format": "date-time" },
+        "self_report_at": { "type": ["string", "null"], "format": "date-time", "description": "When set, now / needs_you / blocked / doing come from the agent's own report made at this time; the other fields come from source." },
+        "error": { "type": "string", "description": "The last attempt to update failed; the fields above are the previous summary." }
+      }
+    },
+    "item": {
+      "type": "object",
+      "required": ["id", "text", "since"],
+      "properties": {
+        "id": { "type": "string", "description": "The same thing keeps its id across summaries, even reworded or moved to another list." },
+        "text": { "type": "string" },
+        "since": { "type": "string", "format": "date-time", "description": "When it entered this list." }
+      }
+    }
+  }
+}

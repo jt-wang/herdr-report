@@ -1,0 +1,76 @@
+id = "herdr-report"
+name = "Herdr Report"
+version = "0.3.0"
+min_herdr_version = "0.8.0"
+description = "What every agent session in Herdr is trying to do, what it has done, and what it is waiting on you for, as an API, a JSON file and a phone page."
+platforms = ["macos", "linux"]
+
+# No build step: the server is plain Node with no dependencies.
+# Every action runs scripts/ctl.sh. Herdr sets HERDR_PLUGIN_CONFIG_DIR, where the
+# summary cache, the log, sessions.json and config.env (HOST, PORT, SUMMARIZER…) live.
+
+[[actions]]
+id = "start"
+title = "Start Herdr Report"
+contexts = ["workspace"]
+command = ["bash", "scripts/ctl.sh", "start"]
+
+[[actions]]
+id = "stop"
+title = "Stop Herdr Report"
+contexts = ["workspace"]
+command = ["bash", "scripts/ctl.sh", "stop"]
+
+[[actions]]
+id = "restart"
+title = "Restart Herdr Report"
+contexts = ["workspace"]
+command = ["bash", "scripts/ctl.sh", "restart"]
+
+[[actions]]
+id = "status"
+title = "Herdr Report status"
+contexts = ["workspace"]
+command = ["bash", "scripts/ctl.sh", "status"]
+
+[[actions]]
+id = "url"
+title = "Show Herdr Report URL"
+contexts = ["workspace"]
+command = ["bash", "scripts/ctl.sh", "url"]
+
+[[actions]]
+id = "check"
+title = "Check what Herdr Report needs"
+contexts = ["workspace"]
+command = ["bash", "scripts/ctl.sh", "check"]
+
+[[actions]]
+id = "update"
+title = "Update Herdr Report"
+contexts = ["workspace"]
+command = ["bash", "scripts/ctl.sh", "update"]
+
+[[actions]]
+id = "summarizer"
+title = "Show the summarizer and the suggested one"
+contexts = ["workspace"]
+command = ["bash", "scripts/ctl.sh", "summarizer"]
+
+[[actions]]
+id = "use-recommended"
+title = "Use the recommended summarizer"
+contexts = ["workspace"]
+command = ["bash", "scripts/ctl.sh", "use-recommended"]
+
+[[actions]]
+id = "summaries-off"
+title = "Turn summaries off"
+contexts = ["workspace"]
+command = ["bash", "scripts/ctl.sh", "summaries-off"]
+
+[[actions]]
+id = "uninstall"
+title = "Uninstall Herdr Report (remove service and cache)"
+contexts = ["workspace"]
+command = ["bash", "scripts/ctl.sh", "uninstall"]

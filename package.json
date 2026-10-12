@@ -1,0 +1,10 @@
+{
+  "name": "herdr-report",
+  "version": "0.3.0",
+  "private": true,
+  "description": "A Herdr plugin: what every coding agent session is doing, what is done and what needs you, as a phone page, notifications and an API",
+  "license": "MIT",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": { "test": "node --test --test-timeout=60000 test/*.test.mjs", "demo": "node tools/demo.mjs" }
+}

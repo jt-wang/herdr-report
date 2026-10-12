@@ -1,0 +1,2 @@
+{"type":"user","message":{"role":"user","content":"Skip watering on rainy days"}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Rain check is in, merging #7"}]}}
